@@ -3,11 +3,13 @@ using System.Collections.Generic;
 using UnityEngine;
 
 public class PlayerMovement : MonoBehaviour {
-	public Vector3 direction;
-	public float speedMultiplier;
+	public Vector3 rightDirection;
+	public Vector3 leftDirection;
+	public float rightSpeedMultiplier;
+	public float leftSpeedMultiplier;
 
 	public float threshold = 0.10f;
-	private float maxSpeed = 10f;
+	private float maxSpeed = 0.1f;
 
 	// Use this for initialization
 	void Start () {
@@ -15,6 +17,7 @@ public class PlayerMovement : MonoBehaviour {
 	
 	// Update is called once per frame
 	void Update () {
-		this.transform.Translate(direction*maxSpeed*speedMultiplier);
+		this.transform.Translate(rightDirection*maxSpeed*rightSpeedMultiplier);
+		this.transform.Translate(leftDirection*maxSpeed*leftSpeedMultiplier);
 	}
 }

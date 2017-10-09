@@ -13,6 +13,8 @@ public class TrackersSimulation : MonoBehaviour {
 
     private LineRenderer lr;
 
+	public string side;
+
 	// Use this for initialization
 	void Start () {
 		tracker = this.gameObject;
@@ -80,7 +82,12 @@ public class TrackersSimulation : MonoBehaviour {
 		
 		DrawLine (tracker.transform.position, r.GetPoint (100), Color.red);
 
-        movement.direction = GetDirection();
+		if (side == "left") {
+			movement.leftDirection = GetDirection();
+		} else if (side == "right") {
+			movement.rightDirection = GetDirection();
+		}
+
     }
 
     public Vector3 GetDirection() {
