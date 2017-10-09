@@ -6,22 +6,23 @@ public class DrawLine : MonoBehaviour {
 
 	public GameObject targetObject;
 
-	void DrawConnectingLine() {
-		GL.PushMatrix ();
-		GL.LoadIdentity ();
-		GL.Begin (GL.LINES);
-		GL.Color (Color.red);
-		GL.Vertex (this.transform.position);
-		GL.Vertex (targetObject.transform.position);
-		GL.End ();
-		GL.PopMatrix ();
+	void Start() {
+		this.gameObject.AddComponent<LineRenderer> ();
+		LineRenderer line = this.GetComponent<LineRenderer> ();
+		line.material.color = Color.red;
+		line.widthMultiplier = 0.2f;
 	}
 
-	public void OnPostRender() {
-		DrawConnectingLine ();
+	void Update() {
+		if (targetObject != null) {
+			LineRenderer line = this.GetComponent<LineRenderer> ();
+			line.SetPosition (0, this.transform.position);
+			line.SetPosition (1, targetObject.transform.position);
+		}
 	}
 
 	void OnDrawGizmos() {
-		Debug.DrawLine (this.transform.position, targetObject.transform.position);
+		if(targetObject != null)
+			Debug.DrawLine (this.transform.position, targetObject.transform.position);
 	}
 }
