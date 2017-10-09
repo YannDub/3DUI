@@ -3,5 +3,7 @@
 ProjectSettings/
 Library/
 Temp/
-
+.vs/
+*.meta
 *.csproj
+obj/
