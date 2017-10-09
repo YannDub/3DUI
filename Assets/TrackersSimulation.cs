@@ -8,31 +8,35 @@ public class TrackersSimulation : MonoBehaviour {
 
 	private Plane objectPlane;
 	private GameObject selectedObject = null;
+    private GameObject myLine;
+
+    public PlayerMovement movement;
+
+    private LineRenderer lr;
 
 	// Use this for initialization
 	void Start () {
-		
-	}
+        myLine = new GameObject();
+        myLine.AddComponent<LineRenderer>();
+        lr = myLine.GetComponent<LineRenderer>();
+        lr.material = new Material(Shader.Find("Particles/Alpha Blended Premultiply"));
+
+        lr.endWidth = lr.startWidth = 0.02f;
+    }
 
 	void DrawLine(Vector3 start, Vector3 end, Color color, float duration = 0.2f) {
-		GameObject myLine = new GameObject();
-		myLine.transform.position = start;
-		myLine.AddComponent<LineRenderer>();
-		LineRenderer lr = myLine.GetComponent<LineRenderer>();
-		lr.material = new Material(Shader.Find("Particles/Alpha Blended Premultiply"));
-		lr.SetColors(color, color);
-		lr.SetWidth(0.1f, 0.1f);
-		lr.SetPosition(0, start);
+        myLine.transform.position = start;
+        lr.startColor = lr.endColor = color;
+        lr.SetPosition(0, start);
 		lr.SetPosition(1, end);
-		GameObject.Destroy(myLine, duration);
 	}
 	
 	// Update is called once per frame
 	void Update () {
 		if (Input.GetKey (KeyCode.LeftArrow)) {
-			rightTracker.transform.Rotate (new Vector3 (0, 0, 1));
+			rightTracker.transform.Rotate (new Vector3 (0, -1, 0));
 		} else if (Input.GetKey (KeyCode.RightArrow)) {
-			rightTracker.transform.Rotate (new Vector3 (0, 0, -1));
+			rightTracker.transform.Rotate (new Vector3 (0, 1, 0));
 		} else if (Input.GetKey (KeyCode.UpArrow)) {
 			rightTracker.transform.Rotate (new Vector3 (1, 0, 0));
 		} else if (Input.GetKey (KeyCode.DownArrow)) {
@@ -69,7 +73,13 @@ public class TrackersSimulation : MonoBehaviour {
 		}
 
 		Ray r = new Ray (rightTracker.transform.position, rightTracker.transform.rotation * new Vector3 (0, 0, 1));
-
+        //Debug.Log(leftTracker.transform.rotation.eulerAngles.x);
 		DrawLine (rightTracker.transform.position, r.GetPoint (100), Color.red);
-	}
+
+        movement.direction = GetDirection();
+    }
+
+    public Vector3 GetDirection() {
+        return Vector3.Normalize(rightTracker.transform.rotation * new Vector3(0, 0, 1));
+    }
 }
