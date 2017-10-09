@@ -3,8 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 
 public class TrackersSimulation : MonoBehaviour {
-	public GameObject leftTracker;
-	public GameObject rightTracker;
+	private GameObject tracker;
 
 	private Plane objectPlane;
 	private GameObject selectedObject = null;
@@ -16,9 +15,10 @@ public class TrackersSimulation : MonoBehaviour {
 
 	// Use this for initialization
 	void Start () {
+		tracker = this.gameObject;
         myLine = new GameObject();
-        myLine.AddComponent<LineRenderer>();
-        lr = myLine.GetComponent<LineRenderer>();
+        
+		lr = myLine.AddComponent<LineRenderer>();
         lr.material = new Material(Shader.Find("Particles/Alpha Blended Premultiply"));
 
         lr.endWidth = lr.startWidth = 0.02f;
@@ -34,13 +34,16 @@ public class TrackersSimulation : MonoBehaviour {
 	// Update is called once per frame
 	void Update () {
 		if (Input.GetKey (KeyCode.LeftArrow)) {
-			rightTracker.transform.Rotate (new Vector3 (0, -1, 0));
-		} else if (Input.GetKey (KeyCode.RightArrow)) {
-			rightTracker.transform.Rotate (new Vector3 (0, 1, 0));
-		} else if (Input.GetKey (KeyCode.UpArrow)) {
-			rightTracker.transform.Rotate (new Vector3 (1, 0, 0));
-		} else if (Input.GetKey (KeyCode.DownArrow)) {
-			rightTracker.transform.Rotate (new Vector3 (-1, 0, 0));
+			tracker.transform.Rotate (new Vector3 (0, -1, 0));
+		} 
+		if (Input.GetKey (KeyCode.RightArrow)) {
+			tracker.transform.Rotate (new Vector3 (0, 1, 0));
+		} 
+		if (Input.GetKey (KeyCode.UpArrow)) {
+			tracker.transform.Rotate (new Vector3 (-1, 0, 0));
+		} 
+		if (Input.GetKey (KeyCode.DownArrow)) {
+			tracker.transform.Rotate (new Vector3 (1, 0, 0));
 		}
 
 		if (Input.GetMouseButton (0)) {
@@ -53,7 +56,7 @@ public class TrackersSimulation : MonoBehaviour {
 				if (objectPlane.Raycast (ray, out rayDistance)) {
 					selectedObject.transform.position = ray.GetPoint (rayDistance);
 				}
-			} else if (Physics.Raycast (ray, out hit) && hit.collider.gameObject == rightTracker) {
+			} else if (Physics.Raycast (ray, out hit) && hit.collider.gameObject == tracker) {
 				selectedObject = hit.collider.gameObject;
 				objectPlane = new Plane (Camera.main.transform.forward, hit.collider.transform.position);
 			} else {
@@ -62,24 +65,25 @@ public class TrackersSimulation : MonoBehaviour {
 		}
 
 		if (Input.GetKeyDown (KeyCode.R)) {
-			leftTracker.transform.rotation = new Quaternion ();
-			rightTracker.transform.rotation = new Quaternion ();
+			tracker.transform.rotation = new Quaternion ();
 		}
 
-		if (Input.GetAxis ("Mouse ScrollWheel") < 0) {
-			leftTracker.transform.Rotate (new Vector3 (-2, 0, 0));
-		} else if (Input.GetAxis ("Mouse ScrollWheel") > 0) {
-			leftTracker.transform.Rotate (new Vector3 (2, 0, 0));
-		}
 
-		Ray r = new Ray (rightTracker.transform.position, rightTracker.transform.rotation * new Vector3 (0, 0, 1));
+		Ray r = new Ray (tracker.transform.position, tracker.transform.rotation * new Vector3 (0, 0, 1));
         //Debug.Log(leftTracker.transform.rotation.eulerAngles.x);
-		DrawLine (rightTracker.transform.position, r.GetPoint (100), Color.red);
+		/*if (Input.GetKeyDown (KeyCode.E)) {
+			//Camera.main.transform.TransformDirection (tracker.transform.rotation * new Vector3 (0, 0, 1));
+			//Camera.main.transform.Rotate(tracker.transform.rotation * new Vector3 (0, 0, 1), Vector3.Angle(new Vector3(0, 0, 1), tracker.transform.rotation * new Vector3 (0, 0, 1)));
+			Vector3 point = r.GetPoint(10);
+			Camera.main.transform.LookAt (point);
+		}*/
+		
+		DrawLine (tracker.transform.position, r.GetPoint (100), Color.red);
 
         movement.direction = GetDirection();
     }
 
     public Vector3 GetDirection() {
-        return Vector3.Normalize(rightTracker.transform.rotation * new Vector3(0, 0, 1));
+        return Vector3.Normalize(tracker.transform.rotation * new Vector3(0, 0, 1));
     }
 }
