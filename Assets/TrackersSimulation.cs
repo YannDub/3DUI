@@ -10,6 +10,8 @@ public class TrackersSimulation : MonoBehaviour {
 	private GameObject selectedObject = null;
     private GameObject myLine;
 
+    public PlayerMovement movement;
+
     private LineRenderer lr;
 
 	// Use this for initialization
@@ -32,9 +34,9 @@ public class TrackersSimulation : MonoBehaviour {
 	// Update is called once per frame
 	void Update () {
 		if (Input.GetKey (KeyCode.LeftArrow)) {
-			rightTracker.transform.Rotate (new Vector3 (0, 0, 1));
+			rightTracker.transform.Rotate (new Vector3 (0, -1, 0));
 		} else if (Input.GetKey (KeyCode.RightArrow)) {
-			rightTracker.transform.Rotate (new Vector3 (0, 0, -1));
+			rightTracker.transform.Rotate (new Vector3 (0, 1, 0));
 		} else if (Input.GetKey (KeyCode.UpArrow)) {
 			rightTracker.transform.Rotate (new Vector3 (1, 0, 0));
 		} else if (Input.GetKey (KeyCode.DownArrow)) {
@@ -73,9 +75,11 @@ public class TrackersSimulation : MonoBehaviour {
 		Ray r = new Ray (rightTracker.transform.position, rightTracker.transform.rotation * new Vector3 (0, 0, 1));
         //Debug.Log(leftTracker.transform.rotation.eulerAngles.x);
 		DrawLine (rightTracker.transform.position, r.GetPoint (100), Color.red);
-	}
 
-    public Vector3 getDirection() {
+        movement.direction = GetDirection();
+    }
+
+    public Vector3 GetDirection() {
         return Vector3.Normalize(rightTracker.transform.rotation * new Vector3(0, 0, 1));
     }
 }
