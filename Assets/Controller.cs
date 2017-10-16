@@ -29,6 +29,8 @@ public class Controller : MonoBehaviour {
 
 		movement.leftSpeedMultiplier = SteamVR_Controller.Input (leftDevice).GetAxis (Valve.VR.EVRButtonId.k_EButton_SteamVR_Trigger).x;
 		movement.rightSpeedMultiplier = SteamVR_Controller.Input (rightDevice).GetAxis (Valve.VR.EVRButtonId.k_EButton_SteamVR_Trigger).x;
+
+
 		/*
 		//Get the x,y position on the pad
 		Vector2 touch = SteamVR_Controller.Input(rightDevice).GetAxis(Valve.VR.EVRButtonId.k_EButton_Axis0);

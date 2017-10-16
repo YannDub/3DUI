@@ -101,7 +101,9 @@ public class TrackersSimulation : MonoBehaviour {
 
 		if (isLerping) {
 			lerpFactor += Time.deltaTime;
-			Camera.main.transform.rotation = Quaternion.Lerp (from, to, lerpFactor * rotationSpeed);
+			//Camera.main.transform.rotation = Quaternion.Lerp (from, to, lerpFactor * rotationSpeed);
+			Quaternion q = Quaternion.Lerp (from, to, lerpFactor * rotationSpeed);
+			movement.rotate (q);
 			isLerping = lerpFactor < 1;
 		}
 		
