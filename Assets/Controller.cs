@@ -30,6 +30,9 @@ public class Controller : MonoBehaviour {
 		movement.leftSpeedMultiplier = SteamVR_Controller.Input (leftDevice).GetAxis (Valve.VR.EVRButtonId.k_EButton_SteamVR_Trigger).x;
 		movement.rightSpeedMultiplier = SteamVR_Controller.Input (rightDevice).GetAxis (Valve.VR.EVRButtonId.k_EButton_SteamVR_Trigger).x;
 
+		if (SteamVR_Controller.Input (leftDevice).GetAxis (Valve.VR.EVRButtonId.k_EButton_SteamVR_Touchpad).x != 0) {
+			movement.startLerping (this.transform.forward, this.transform.position);
+		}
 
 		/*
 		//Get the x,y position on the pad

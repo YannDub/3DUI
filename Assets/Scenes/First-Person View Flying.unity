@@ -511,6 +511,7 @@ MonoBehaviour:
   rightSpeedMultiplier: 0
   leftSpeedMultiplier: 0
   threshold: 0.1
+  rotationSpeed: 42
 --- !u!1 &621520199 stripped
 GameObject:
   m_PrefabParentObject: {fileID: 1398295958441422, guid: f7301a6aa5f15974db00793338b7c806,
@@ -694,7 +695,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d7de0775f5a6efa4db130e9d94438b28, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  movement: {fileID: 0}
+  movement: {fileID: 583224921}
   side: 
 --- !u!1 &874085680 stripped
 GameObject:
@@ -772,7 +773,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d7de0775f5a6efa4db130e9d94438b28, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  movement: {fileID: 0}
+  movement: {fileID: 583224921}
   side: 
 --- !u!1001 &1125306412
 Prefab:
@@ -1039,6 +1040,7 @@ MonoBehaviour:
   rightSpeedMultiplier: 0
   leftSpeedMultiplier: 0
   threshold: 0.1
+  rotationSpeed: 1
 --- !u!1001 &1963395299
 Prefab:
   m_ObjectHideFlags: 0

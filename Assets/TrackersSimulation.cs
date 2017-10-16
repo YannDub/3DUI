@@ -15,8 +15,6 @@ public class TrackersSimulation : MonoBehaviour {
 
 	public string side;
 
-	public float rotationSpeed;
-
 	// Use this for initialization
 	void Start () {
 		tracker = this.gameObject;
@@ -35,11 +33,6 @@ public class TrackersSimulation : MonoBehaviour {
 		lr.SetPosition(1, end);
 	}
 
-	private float lerpFactor = 0;
-	private bool isLerping = false;
-	private Quaternion from;
-	private Quaternion to;
-	
 	// Update is called once per frame
 	void Update () {
 		if (Input.GetKey (KeyCode.LeftArrow)) {
@@ -77,36 +70,12 @@ public class TrackersSimulation : MonoBehaviour {
 			tracker.transform.rotation = new Quaternion ();
 		}
 
-
 		Ray r = new Ray (tracker.transform.position, tracker.transform.rotation * new Vector3 (0, 0, 1));
-        //Debug.Log(leftTracker.transform.rotation.eulerAngles.x);
-		if (Input.GetKey (KeyCode.E)) {
-			//Camera.main.transform.TransformDirection (tracker.transform.rotation * new Vector3 (0, 0, 1));
-			//Camera.main.transform.Rotate(tracker.transform.rotation * new Vector3 (0, 0, 1), Vector3.Angle(new Vector3(0, 0, 1), tracker.transform.rotation * new Vector3 (0, 0, 1)));
-			/*Vector3 point = r.GetPoint(10);
-			Camera.main.transform.LookAt (point);*/
 
-			this.transform.position = tracker.transform.position;
-			from = Camera.main.transform.rotation;
-			to = Quaternion.FromToRotation (Camera.main.transform.forward, tracker.transform.transform.transform.transform.forward);
-			isLerping = true;
-			lerpFactor = 0;
-
-			//Camera.main.transform.rotation *= q;
+		if (Input.GetKeyDown (KeyCode.E)) {
+			movement.startLerping(tracker.transform.forward, tracker.transform.position);
 		}
 
-		if (Input.GetKeyUp (KeyCode.E)) {
-			isLerping = false;
-		}
-
-		if (isLerping) {
-			lerpFactor += Time.deltaTime;
-			//Camera.main.transform.rotation = Quaternion.Lerp (from, to, lerpFactor * rotationSpeed);
-			Quaternion q = Quaternion.Lerp (from, to, lerpFactor * rotationSpeed);
-			movement.rotate (q);
-			isLerping = lerpFactor < 1;
-		}
-		
 		DrawLine (tracker.transform.position, r.GetPoint (100), Color.red);
 
 		if (side == "left") {

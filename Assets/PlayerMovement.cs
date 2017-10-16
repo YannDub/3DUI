@@ -10,6 +10,12 @@ public class PlayerMovement : MonoBehaviour {
 
 	public float threshold = 0.10f;
 	private float maxSpeed = 0.1f;
+	public float rotationSpeed = 5;
+
+	private float lerpFactor = 0;
+	private bool isLerping = false;
+	private Quaternion from;
+	private Quaternion to;
 
 	// Use this for initialization
 	void Start () {
@@ -19,10 +25,27 @@ public class PlayerMovement : MonoBehaviour {
 	void Update () {
 		this.transform.Translate(rightDirection*maxSpeed*rightSpeedMultiplier);
 		this.transform.Translate(leftDirection*maxSpeed*leftSpeedMultiplier);
+
+		if (isLerping) {
+			lerpFactor += Time.deltaTime;
+			transform.rotation = Quaternion.Lerp (from, to, lerpFactor * rotationSpeed);
+			isLerping = lerpFactor < 1;
+		}
 	}
 
-	public void rotate(Quaternion q) {
-		Debug.Log ("rotate " + q);
-		transform.rotation = q;
+	public void startLerping(Vector3 to, Vector3 newPosition) {
+		/*
+			this.transform.position = tracker.transform.position;
+			from = Camera.main.transform.rotation;
+			to = Quaternion.FromToRotation (Camera.main.transform.forward, tracker.transform.transform.transform.transform.forward);
+			isLerping = true;
+			lerpFactor = 0;
+			*/
+		//this.transform.position = newPosition;
+		this.from = this.transform.rotation;
+		this.to = Quaternion.FromToRotation (this.transform.forward, to);
+		isLerping = true;
+		lerpFactor = 0;
 	}
+
 }
