@@ -34,6 +34,8 @@ public class PlayerMovement : MonoBehaviour {
 	}
 
 	public void startLerping(Vector3 to, Vector3 newPosition) {
+        if (isLerping) return;
+        Debug.Log("start lerping");
 		/*
 			this.transform.position = tracker.transform.position;
 			from = Camera.main.transform.rotation;
