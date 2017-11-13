@@ -4,13 +4,7 @@ using UnityEngine;
 using System.Collections;
 using System.Collections.Generic;
 
-public enum LimbState {
-	Stationary,
-	Up,
-	Down
-}
-
-public class LadderTask : MonoBehaviour {
+public class Method2 : MonoBehaviour {
 
 	[Tooltip("We expect the SteamVR [CameraRig] prefab will be used and referenced here.")]
 	public GameObject ViveCameraRig;
@@ -94,7 +88,7 @@ public class LadderTask : MonoBehaviour {
 			Debug.Log("no left device");
 			return ;}
 	}
-	
+
 	// Update is called once per frame
 	void Update () {
 
@@ -143,13 +137,13 @@ public class LadderTask : MonoBehaviour {
 			float diff = lastLeftY - SteamVR_Controller.Input (leftDevice).transform.pos.y; 
 			if (Mathf.Abs (diff) > threshold) {
 				if (leftHandControl) {
-					if (diff > 0) { 
+					if (diff < 0) { 
 						LeftHandUp ();
 					} else {
 						LeftHandDown ();
 					}
 				} else {
-					if (diff > 0) { 
+					if (diff < 0) { 
 						LeftFootUp ();
 					} else {
 						LeftFootDown ();
@@ -162,13 +156,13 @@ public class LadderTask : MonoBehaviour {
 			float diff = lastRightY - SteamVR_Controller.Input (rightDevice).transform.pos.y; 
 			if (Mathf.Abs (diff) > threshold) {
 				if (rightHandControl) {
-					if (diff > 0) { 
+					if (diff < 0) { 
 						RightHandUp ();
 					} else {
 						RightHandDown ();
 					}
 				} else {
-					if (diff > 0) { 
+					if (diff < 0) { 
 						RightFootUp ();
 					} else {
 						RightFootDown ();
@@ -387,7 +381,7 @@ public class LadderTask : MonoBehaviour {
 			lastRightFoot = currentRightFoot = 0.0f;
 			lastRightHand = currentRightHand = 0.0f;
 		}
-			
+
 	}
 
 	public void LeftFootUp() {
