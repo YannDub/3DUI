@@ -1,6 +1,5 @@
 *.sln
 *.userprefs
-ProjectSettings/
 Library/
 Temp/
 .vs/
