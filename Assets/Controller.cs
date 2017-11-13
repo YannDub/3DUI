@@ -43,7 +43,7 @@ public class Controller : MonoBehaviour {
 
 
 		//Check if the player press on the pad button
-		if(SteamVR_Controller.Input(leftDevice).GetPress(SteamVR_Controller.ButtonMask.Touchpad)){
+		if(SteamVR_Controller.Input(leftDevice).GetPressDown(SteamVR_Controller.ButtonMask.Touchpad)){
             movement.startLerping(this.transform.forward, this.transform.position);
         }
 

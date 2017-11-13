@@ -23,6 +23,9 @@ public class PlayerMovement : MonoBehaviour {
 	
 	// Update is called once per frame
 	void Update () {
+		float leftSpeed = maxSpeed * leftSpeedMultiplier;
+		float rightSpeed = maxSpeed * rightSpeedMultiplier;
+
 		this.transform.Translate(rightDirection*maxSpeed*rightSpeedMultiplier);
 		this.transform.Translate(leftDirection*maxSpeed*leftSpeedMultiplier);
 
@@ -35,15 +38,6 @@ public class PlayerMovement : MonoBehaviour {
 
 	public void startLerping(Vector3 to, Vector3 newPosition) {
         if (isLerping) return;
-        Debug.Log("start lerping");
-		/*
-			this.transform.position = tracker.transform.position;
-			from = Camera.main.transform.rotation;
-			to = Quaternion.FromToRotation (Camera.main.transform.forward, tracker.transform.transform.transform.transform.forward);
-			isLerping = true;
-			lerpFactor = 0;
-			*/
-		//this.transform.position = newPosition;
 		this.from = this.transform.rotation;
 		this.to = Quaternion.FromToRotation (this.transform.forward, to);
 		isLerping = true;
