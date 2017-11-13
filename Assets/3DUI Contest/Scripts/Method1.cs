@@ -4,13 +4,7 @@ using UnityEngine;
 using System.Collections;
 using System.Collections.Generic;
 
-public enum LimbState {
-	Stationary,
-	Up,
-	Down
-}
-
-public class LadderTask : MonoBehaviour {
+public class Method1 : MonoBehaviour {
 
 	[Tooltip("We expect the SteamVR [CameraRig] prefab will be used and referenced here.")]
 	public GameObject ViveCameraRig;
@@ -49,9 +43,6 @@ public class LadderTask : MonoBehaviour {
 	private State rightState = State.IDLE;
 	private State leftState = State.IDLE;
 	private bool leftHandControl = true, rightHandControl = true;
-
-	private float lastLeftY = 0.0f, lastRightY = 0.0f;
-	public float threshold = 1.0f;
 
 	// Use this for initialization
 	void Start () {
@@ -94,7 +85,7 @@ public class LadderTask : MonoBehaviour {
 			Debug.Log("no left device");
 			return ;}
 	}
-	
+
 	// Update is called once per frame
 	void Update () {
 
@@ -119,62 +110,38 @@ public class LadderTask : MonoBehaviour {
 		else
 			rightHandControl = false;
 
-		if (leftDevice != -1 && SteamVR_Controller.Input (leftDevice).GetAxis (Valve.VR.EVRButtonId.k_EButton_SteamVR_Touchpad).x != 0) {
+		if (leftDevice != -1 && SteamVR_Controller.Input (leftDevice).GetAxis (Valve.VR.EVRButtonId.k_EButton_SteamVR_Touchpad).x != 0 || Input.GetKeyDown(KeyCode.A)) {
 			leftState = State.PRESSED;
-			if(lastLeftY == 0) lastLeftY = SteamVR_Controller.Input (leftDevice).transform.pos.y;
 		}
 
-		if (rightDevice != -1 && SteamVR_Controller.Input (rightDevice).GetAxis (Valve.VR.EVRButtonId.k_EButton_SteamVR_Touchpad).x != 0) {
+		if (rightDevice != -1 && SteamVR_Controller.Input (rightDevice).GetAxis (Valve.VR.EVRButtonId.k_EButton_SteamVR_Touchpad).x != 0 || Input.GetKeyDown(KeyCode.E)) {
 			rightState = State.PRESSED;
-			if(lastRightY == 0) lastRightY = SteamVR_Controller.Input (leftDevice).transform.pos.y;
 		}
 
-		if (leftDevice != -1 && SteamVR_Controller.Input (leftDevice).GetAxis (Valve.VR.EVRButtonId.k_EButton_SteamVR_Touchpad).x == 0) {
+		if (leftDevice != -1 && SteamVR_Controller.Input (leftDevice).GetAxis (Valve.VR.EVRButtonId.k_EButton_SteamVR_Touchpad).x == 0 || Input.GetKeyUp(KeyCode.A)) {
 			if (leftState == State.PRESSED)
 				leftState = State.RELEASE;
 		}
 
-		if (rightDevice != -1 && SteamVR_Controller.Input (rightDevice).GetAxis (Valve.VR.EVRButtonId.k_EButton_SteamVR_Touchpad).x == 0) {
+		if (rightDevice != -1 && SteamVR_Controller.Input (rightDevice).GetAxis (Valve.VR.EVRButtonId.k_EButton_SteamVR_Touchpad).x == 0 || Input.GetKeyUp(KeyCode.E)) {
 			if (rightState == State.PRESSED)
 				rightState = State.RELEASE;
 		}
 
 		if (leftState == State.RELEASE) {
-			float diff = lastLeftY - SteamVR_Controller.Input (leftDevice).transform.pos.y; 
-			if (Mathf.Abs (diff) > threshold) {
-				if (leftHandControl) {
-					if (diff > 0) { 
-						LeftHandUp ();
-					} else {
-						LeftHandDown ();
-					}
-				} else {
-					if (diff > 0) { 
-						LeftFootUp ();
-					} else {
-						LeftFootDown ();
-					}
-				}
-			}
+			if (leftHandControl)
+				LeftHandUp ();
+			else
+				LeftFootUp ();
+			if(leftDevice == -1) leftHandControl = !leftHandControl;
 		}
 
 		if (rightState == State.RELEASE) {
-			float diff = lastRightY - SteamVR_Controller.Input (rightDevice).transform.pos.y; 
-			if (Mathf.Abs (diff) > threshold) {
-				if (rightHandControl) {
-					if (diff > 0) { 
-						RightHandUp ();
-					} else {
-						RightHandDown ();
-					}
-				} else {
-					if (diff > 0) { 
-						RightFootUp ();
-					} else {
-						RightFootDown ();
-					}
-				}
-			}
+			if (rightHandControl)
+				RightHandUp ();
+			else
+				RightFootUp ();
+			if(rightDevice == -1) rightHandControl = !rightHandControl;
 		}
 
 		if (!taskCompleted) {
@@ -387,7 +354,7 @@ public class LadderTask : MonoBehaviour {
 			lastRightFoot = currentRightFoot = 0.0f;
 			lastRightHand = currentRightHand = 0.0f;
 		}
-			
+
 	}
 
 	public void LeftFootUp() {
