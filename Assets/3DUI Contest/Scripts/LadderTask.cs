@@ -42,6 +42,13 @@ public class LadderTask : MonoBehaviour {
 	private float fallVelocity;
 
 	private bool taskCompleted;
+	private int rightDevice = -1;
+	private int leftDevice = -1;
+
+	private enum State {PRESSED, RELEASE, IDLE};
+	private State rightState = State.IDLE;
+	private State leftState = State.IDLE;
+	private bool leftHandControl = true, rightHandControl = true;
 
 	// Use this for initialization
 	void Start () {
@@ -68,6 +75,21 @@ public class LadderTask : MonoBehaviour {
 		fallVelocity = 0.0f;
 
 		taskCompleted = false;
+
+		//Get the right device
+		rightDevice = SteamVR_Controller.GetDeviceIndex(SteamVR_Controller.DeviceRelation.FarthestRight);
+
+		//Check if the device is valid
+		if(rightDevice == -1){
+			Debug.Log("no right device");
+			return ;}
+
+		leftDevice = SteamVR_Controller.GetDeviceIndex(SteamVR_Controller.DeviceRelation.FarthestLeft);
+
+		//Check if the device is valid
+		if(leftDevice == -1){
+			Debug.Log("no left device");
+			return ;}
 	}
 	
 	// Update is called once per frame
@@ -78,6 +100,45 @@ public class LadderTask : MonoBehaviour {
 		UpdateLeftHand ();
 		UpdateRightFoot ();
 		UpdateRightHand ();
+
+		if (leftState == State.RELEASE)
+			leftState = State.IDLE;
+		if (rightState == State.RELEASE)
+			rightState = State.IDLE;
+
+		if (leftDevice != -1 && SteamVR_Controller.Input (leftDevice).GetAxis (Valve.VR.EVRButtonId.k_EButton_SteamVR_Touchpad).x != 0 || Input.GetKeyDown(KeyCode.A)) {
+			leftState = State.PRESSED;
+		}
+
+		if (rightDevice != -1 && SteamVR_Controller.Input (rightDevice).GetAxis (Valve.VR.EVRButtonId.k_EButton_SteamVR_Touchpad).x != 0 || Input.GetKeyDown(KeyCode.E)) {
+			rightState = State.PRESSED;
+		}
+
+		if (leftDevice != -1 && SteamVR_Controller.Input (leftDevice).GetAxis (Valve.VR.EVRButtonId.k_EButton_SteamVR_Touchpad).x == 0 || Input.GetKeyUp(KeyCode.A)) {
+			if (leftState == State.PRESSED)
+				leftState = State.RELEASE;
+		}
+
+		if (rightDevice != -1 && SteamVR_Controller.Input (rightDevice).GetAxis (Valve.VR.EVRButtonId.k_EButton_SteamVR_Touchpad).x == 0 || Input.GetKeyUp(KeyCode.E)) {
+			if (rightState == State.PRESSED)
+				rightState = State.RELEASE;
+		}
+
+		if (leftState == State.RELEASE) {
+			if (leftHandControl)
+				LeftHandUp ();
+			else
+				LeftFootUp ();
+			leftHandControl = !leftHandControl;
+		}
+
+		if (rightState == State.RELEASE) {
+			if (rightHandControl)
+				RightHandUp ();
+			else
+				RightFootUp ();
+			rightHandControl = !rightHandControl;
+		}
 
 		if (!taskCompleted) {
 
