@@ -106,6 +106,16 @@ public class LadderTask : MonoBehaviour {
 		if (rightState == State.RELEASE)
 			rightState = State.IDLE;
 
+		if (leftDevice != -1 && SteamVR_Controller.Input (leftDevice).transform.pos.y >= ViveCameraRig.transform.position.y)
+			leftHandControl = true;
+		else
+			leftHandControl = false;
+
+		if (rightDevice != -1 && SteamVR_Controller.Input (rightDevice).transform.pos.y >= ViveCameraRig.transform.position.y)
+			rightHandControl = true;
+		else
+			rightHandControl = false;
+
 		if (leftDevice != -1 && SteamVR_Controller.Input (leftDevice).GetAxis (Valve.VR.EVRButtonId.k_EButton_SteamVR_Touchpad).x != 0 || Input.GetKeyDown(KeyCode.A)) {
 			leftState = State.PRESSED;
 		}
@@ -129,7 +139,7 @@ public class LadderTask : MonoBehaviour {
 				LeftHandUp ();
 			else
 				LeftFootUp ();
-			leftHandControl = !leftHandControl;
+			if(leftDevice == -1) leftHandControl = !leftHandControl;
 		}
 
 		if (rightState == State.RELEASE) {
@@ -137,7 +147,7 @@ public class LadderTask : MonoBehaviour {
 				RightHandUp ();
 			else
 				RightFootUp ();
-			rightHandControl = !rightHandControl;
+			if(rightDevice == -1) rightHandControl = !rightHandControl;
 		}
 
 		if (!taskCompleted) {
