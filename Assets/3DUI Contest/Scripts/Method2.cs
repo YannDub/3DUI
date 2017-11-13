@@ -137,13 +137,13 @@ public class Method2 : MonoBehaviour {
 			float diff = lastLeftY - SteamVR_Controller.Input (leftDevice).transform.pos.y; 
 			if (Mathf.Abs (diff) > threshold) {
 				if (leftHandControl) {
-					if (diff > 0) { 
+					if (diff < 0) { 
 						LeftHandUp ();
 					} else {
 						LeftHandDown ();
 					}
 				} else {
-					if (diff > 0) { 
+					if (diff < 0) { 
 						LeftFootUp ();
 					} else {
 						LeftFootDown ();
@@ -156,13 +156,13 @@ public class Method2 : MonoBehaviour {
 			float diff = lastRightY - SteamVR_Controller.Input (rightDevice).transform.pos.y; 
 			if (Mathf.Abs (diff) > threshold) {
 				if (rightHandControl) {
-					if (diff > 0) { 
+					if (diff < 0) { 
 						RightHandUp ();
 					} else {
 						RightHandDown ();
 					}
 				} else {
-					if (diff > 0) { 
+					if (diff < 0) { 
 						RightFootUp ();
 					} else {
 						RightFootDown ();
