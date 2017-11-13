@@ -9,7 +9,9 @@ public class TrackersSimulation : MonoBehaviour {
 	private GameObject selectedObject = null;
     private GameObject myLine;
 
-    public PlayerMovement movement;
+    public Quadcopter drone;
+
+    //public PlayerMovement movement;
 
     private LineRenderer lr;
 
@@ -19,8 +21,8 @@ public class TrackersSimulation : MonoBehaviour {
 	void Start () {
 		tracker = this.gameObject;
         myLine = new GameObject();
-        
-		lr = myLine.AddComponent<LineRenderer>();
+
+        lr = myLine.AddComponent<LineRenderer>();
         lr.material = new Material(Shader.Find("Particles/Alpha Blended Premultiply"));
 
         lr.endWidth = lr.startWidth = 0.02f;
@@ -72,17 +74,38 @@ public class TrackersSimulation : MonoBehaviour {
 
 		Ray r = new Ray (tracker.transform.position, tracker.transform.rotation * new Vector3 (0, 0, 1));
 
-		if (Input.GetKeyDown (KeyCode.E)) {
+		/*if (Input.GetKeyDown (KeyCode.E)) {
 			movement.startLerping(tracker.transform.forward, tracker.transform.position);
-		}
+		}*/
 
 		DrawLine (tracker.transform.position, r.GetPoint (100), Color.red);
 
-		if (side == "left") {
+        Vector3 direction = GetDirection();
+
+        Vector3 dronePos = drone.transform.up;
+
+        float pitch = Mathf.Asin(direction.y);
+        float pitchb = Mathf.Asin(dronePos.y);
+
+        float yaw = Mathf.Asin(direction.x / Mathf.Cos(pitch)); //Beware cos(pitch)==0, catch this exception!
+        float yawb = Mathf.Asin(dronePos.x / Mathf.Cos(pitchb));
+        float roll = 0;
+
+        float truePitch = pitchb - pitch;
+        float trueYaw = yawb - yaw;
+
+        float power = Input.GetAxisRaw("Power");
+
+        Debug.Log(power + " " + truePitch + " " + trueYaw + " " + roll);
+
+        // Flys the quadcopter using the inputs
+        drone.Drive(power, truePitch, trueYaw, roll);
+
+        /*if (side == "left") {
 			movement.leftDirection = GetDirection();
 		} else if (side == "right") {
 			movement.rightDirection = GetDirection();
-		}
+		}*/
 
     }
 
