@@ -62,6 +62,9 @@ public class TrackersSimulation : MonoBehaviour
 
     bool lockPitch = false;
     bool lockYaw = false;
+
+    float lastPitch;
+    float lastYaw;
     // Update is called once per frame
     void Update()
     {
@@ -135,16 +138,29 @@ public class TrackersSimulation : MonoBehaviour
         if (lockYaw) trueYaw = 0;
         if (lockPitch) truePitch = 0;
 
-        if (Mathf.Abs(truePitch) <= 0.1 && Mathf.Abs(trueYaw) <= 0.1)
+
+        if (Mathf.Abs(Mathf.Rad2Deg * truePitch) <= 1) lockPitch = true;
+        if (lastYaw * trueYaw < 0) lockYaw = true;
+
+        if (lockPitch && lockYaw)
         {
-            lockYaw = lockPitch = true;
             Debug.Log("Fin rotation");
-            drone.Drive(0, 0, 0, 0);
+            drone.Drive(power, 0, 0, 0);
+        } else
+        {
+            drone.Drive(power, lockYaw ? 0 : 0, trueYaw, 0);
         }
 
-        drone.Drive(0.1f, truePitch, trueYaw, 0);
+        if (Input.GetKeyDown(KeyCode.W))
+        {
+            lockPitch = lockYaw = false;
+        }
 
-        Debug.Log(drone.transform.up + " " + tracker.transform.forward);
+
+        lastPitch = truePitch;
+        lastYaw = trueYaw;
+
+        Debug.Log("Pitch :" + Mathf.Rad2Deg * truePitch + " Yaw : " + Mathf.Rad2Deg * trueYaw);
 
 
         /*if (side == "left") {
