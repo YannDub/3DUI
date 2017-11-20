@@ -18,16 +18,25 @@ public class TrackersSimulation : MonoBehaviour
 
     public string side;
 
+    private int leftDevice;
+
+    private float ceiling;
+
     // Use this for initialization
     void Start()
     {
         tracker = this.gameObject;
         myLine = new GameObject();
 
+        leftDevice = SteamVR_Controller.GetDeviceIndex(SteamVR_Controller.DeviceRelation.FarthestLeft);
+
         lr = myLine.AddComponent<LineRenderer>();
         lr.material = new Material(Shader.Find("Particles/Alpha Blended Premultiply"));
 
         lr.endWidth = lr.startWidth = 0.02f;
+
+        float pitchMax = 75;
+        ceiling = pitchMax * 0.5f / 90;
     }
 
     void DrawLine(Vector3 start, Vector3 end, Color color, float duration = 0.2f)
@@ -58,13 +67,18 @@ public class TrackersSimulation : MonoBehaviour
     }
 
 
-
+    float previousPower = 0;
+    float power = 0;
 
     bool lockPitch = false;
     bool lockYaw = false;
 
     float lastPitch;
     float lastYaw;
+
+
+    float cumulatedPitch = 0;
+
     // Update is called once per frame
     void Update()
     {
@@ -121,9 +135,10 @@ public class TrackersSimulation : MonoBehaviour
 
         DrawLine(tracker.transform.position, r.GetPoint(100), Color.red);
 
+        //float power = Input.GetAxisRaw("Power");
 
+       
 
-        float power = Input.GetAxisRaw("Power");
 
         //Debug.Log(power + " " + truePitch + " " + trueYaw + " " + roll);
 
@@ -145,16 +160,82 @@ public class TrackersSimulation : MonoBehaviour
         if (lockPitch && lockYaw)
         {
             Debug.Log("Fin rotation");
-            drone.Drive(power, 0, 0, 0);
+            //drone.Drive(power, 0, 0, 0);
         } else
         {
-            drone.Drive(power, lockYaw ? 0 : 0, trueYaw, 0);
+            //drone.Drive(power, lockYaw ? 0 : 0, trueYaw, 0);
+            
         }
 
-        if (Input.GetKeyDown(KeyCode.W))
+
+
+
+
+        if (leftDevice != -1)
         {
-            lockPitch = lockYaw = false;
+            float buttonPression = SteamVR_Controller.Input(leftDevice).GetAxis(Valve.VR.EVRButtonId.k_EButton_SteamVR_Trigger).x;
+            Debug.Log("button pression " + buttonPression);
+            if (buttonPression < 0.1)
+            {
+                drone.gyroStabilization = true;
+                previousPower = 0;
+                power = 0;
+                Debug.Log("inferior");
+                drone.Drive(power, 0, 0, 0);
+            }
+            else
+            {
+                Debug.Log("superior " + previousPower + " " + power + " " + ceiling + " " + buttonPression);
+                drone.gyroStabilization = false;
+
+
+                float pitch = (previousPower - power) * ceiling * 10;
+
+                float tmpCumul = cumulatedPitch + pitch;
+
+                if (tmpCumul > 1)
+                {
+                    pitch = 1 - cumulatedPitch;
+                } else if (tmpCumul < 0)
+                {
+                    pitch = cumulatedPitch;
+                }
+
+                cumulatedPitch += pitch;
+
+                if (cumulatedPitch < 0) cumulatedPitch = 0;
+                if (cumulatedPitch > 1) cumulatedPitch = 1;
+               
+
+                Debug.Log("pitch " + pitch + " cumul " + cumulatedPitch);
+                
+
+
+                drone.Drive(power, pitch, trueYaw, 0);
+
+                previousPower = power;
+                power = buttonPression;
+            }
         }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+        //if (Input.GetKeyDown(KeyCode.W))
+        //{
+        lockPitch = lockYaw = false;
+        //}
 
 
         lastPitch = truePitch;
@@ -163,12 +244,7 @@ public class TrackersSimulation : MonoBehaviour
         Debug.Log("Pitch :" + Mathf.Rad2Deg * truePitch + " Yaw : " + Mathf.Rad2Deg * trueYaw);
 
 
-        /*if (side == "left") {
-			movement.leftDirection = GetDirection();
-		} else if (side == "right") {
-			movement.rightDirection = GetDirection();
-		}*/
-
+        
     }
 
     public Vector3 GetDirection()
