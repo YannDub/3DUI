@@ -19,7 +19,7 @@ public class TrackersSimulation : MonoBehaviour {
 
 	// Use this for initialization
 	void Start () {
-		tracker = this.gameObject;
+        tracker = this.gameObject;
         myLine = new GameObject();
 
         lr = myLine.AddComponent<LineRenderer>();
@@ -93,13 +93,19 @@ public class TrackersSimulation : MonoBehaviour {
 
         float truePitch = pitchb - pitch;
         float trueYaw = yawb - yaw;
+        float power = 0;//Input.GetAxisRaw("Power");
+        if (Input.GetKey(KeyCode.Space))
+        {
+            power = 1.0f;
 
-        float power = Input.GetAxisRaw("Power");
+            Debug.Log(power + " " + truePitch + " " + trueYaw + " " + roll);
 
-        Debug.Log(power + " " + truePitch + " " + trueYaw + " " + roll);
+            // Flys the quadcopter using the inputs
+            drone.Drive(power, truePitch, trueYaw, roll);
+        }
+        
 
-        // Flys the quadcopter using the inputs
-        drone.Drive(power, truePitch, trueYaw, roll);
+
 
         /*if (side == "left") {
 			movement.leftDirection = GetDirection();
