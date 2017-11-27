@@ -48,9 +48,47 @@ public class TrackersSimulation : MonoBehaviour
     }
 
 
-    Vector2 GetYawPitch(Vector3 dir)
+
+    //Find the line of intersection between two planes.
+    //The inputs are two game objects which represent the planes.
+    //The outputs are a point on the line and a vector which indicates it's direction.
+    /*void planePlaneIntersection(out Vector3 linePoint, out Vector3 lineVec, Vector3 normal1, Vector3 pt1, Vector3 normal2, Vector3 pt2)
     {
-        Vector3 direction = GetDirection();
+
+        linePoint = Vector3.zero;
+        lineVec = Vector3.zero;
+
+        //Get the normals of the planes.
+        Vector3 plane1Normal = normal1;
+        Vector3 plane2Normal = normal2;
+
+        //We can get the direction of the line of intersection of the two planes by calculating the
+        //cross product of the normals of the two planes. Note that this is just a direction and the line
+        //is not fixed in space yet.
+        lineVec = Vector3.Cross(plane1Normal, plane2Normal);
+
+        //Next is to calculate a point on the line to fix it's position. This is done by finding a vector from
+        //the plane2 location, moving parallel to it's plane, and intersecting plane1. To prevent rounding
+        //errors, this vector also has to be perpendicular to lineDirection. To get this vector, calculate
+        //the cross product of the normal of plane2 and the lineDirection.     
+        Vector3 ldir = Vector3.Cross(plane2Normal, lineVec);
+
+        float numerator = Vector3.Dot(plane1Normal, ldir);
+
+        //Prevent divide by zero.
+        if (Mathf.Abs(numerator) > 0.000001f)
+        {
+
+            Vector3 plane1ToPlane2 = plane1. - plane2.transform.position;
+            float t = Vector3.Dot(plane1Normal, plane1ToPlane2) / numerator;
+            linePoint = plane2.transform.position + t * ldir;
+        }
+    }*/
+
+    float GetYawPitch(Vector3 dir)
+    {
+        /*Vector3 direction = GetDirection();
+
 
         Vector3 dronePos = dir;
 
@@ -60,10 +98,18 @@ public class TrackersSimulation : MonoBehaviour
         float yaw = Mathf.Asin(direction.x / Mathf.Cos(pitch)); //Beware cos(pitch)==0, catch this exception!
         float yawb = Mathf.Asin(dronePos.x / Mathf.Cos(pitchb));
 
-        float truePitch = pitchb - pitch;
         float trueYaw = yawb - yaw;
 
-        return new Vector2(trueYaw, truePitch);
+        Debug.Log("yaw " + yaw + " - true " + trueYaw);
+        
+        return trueYaw;*/
+        
+        Vector2 direction = new Vector2(GetDirection().x, GetDirection().z);
+        Vector2 droneDir = new Vector2(dir.x, dir.z);
+
+        Debug.Log("angle " + Vector2.Angle(direction, droneDir));
+        
+        return (Vector2.Dot(direction, droneDir) < 0 ?  -1 : 1) * Vector2.Angle(direction, droneDir) * Mathf.Deg2Rad;
     }
 
 
@@ -78,7 +124,8 @@ public class TrackersSimulation : MonoBehaviour
 
 
     float cumulatedPitch = 0;
-
+    float lastBtnPressure = 0;
+    float pitchSum;
     // Update is called once per frame
     void Update()
     {
@@ -129,122 +176,39 @@ public class TrackersSimulation : MonoBehaviour
 
         Ray r = new Ray(tracker.transform.position, tracker.transform.rotation * new Vector3(0, 0, 1));
 
-        /*if (Input.GetKeyDown (KeyCode.E)) {
-			movement.startLerping(tracker.transform.forward, tracker.transform.position);
-		}*/
 
         DrawLine(tracker.transform.position, r.GetPoint(100), Color.red);
 
-        //float power = Input.GetAxisRaw("Power");
 
-       
-
-
-        //Debug.Log(power + " " + truePitch + " " + trueYaw + " " + roll);
-
-        // Flys the quadcopter using the inputs
-
-        //if (Mathf.Abs(trueYaw) <= 0.1) lockYaw = true;
-        //if (Mathf.Abs(truePitch) <= 0.1) lockPitch = true;
-
-        float trueYaw = GetYawPitch(drone.transform.forward).x;
-        float truePitch = GetYawPitch(drone.transform.up).y;
+        float trueYaw = GetYawPitch(drone.transform.forward);
 
         if (lockYaw) trueYaw = 0;
-        if (lockPitch) truePitch = 0;
-
-
-        if (Mathf.Abs(Mathf.Rad2Deg * truePitch) <= 1) lockPitch = true;
+        
         if (lastYaw * trueYaw < 0) lockYaw = true;
-
-        if (lockPitch && lockYaw)
-        {
-            Debug.Log("Fin rotation");
-            //drone.Drive(power, 0, 0, 0);
-        } else
-        {
-            //drone.Drive(power, lockYaw ? 0 : 0, trueYaw, 0);
-            
-        }
-
-
-
-
+        
 
         if (leftDevice != -1)
         {
             float buttonPression = SteamVR_Controller.Input(leftDevice).GetAxis(Valve.VR.EVRButtonId.k_EButton_SteamVR_Trigger).x;
-            Debug.Log("button pression " + buttonPression);
-            if (buttonPression < 0.1)
-            {
-                drone.gyroStabilization = true;
-                previousPower = 0;
-                power = 0;
-                Debug.Log("inferior");
-                drone.Drive(power, 0, 0, 0);
-            }
-            else
-            {
-                Debug.Log("superior " + previousPower + " " + power + " " + ceiling + " " + buttonPression);
-                drone.gyroStabilization = false;
 
+            float deltaPressure = buttonPression - lastBtnPressure;
 
-                float pitch = (previousPower - power) * ceiling * 10;
+            Vector3 intersect = Vector3.Cross(drone.transform.right, Vector3.up);
 
-                float tmpCumul = cumulatedPitch + pitch;
+            float resetPitchAngle = Vector3.Angle(intersect, drone.transform.forward);
 
-                if (tmpCumul > 1)
-                {
-                    pitch = 1 - cumulatedPitch;
-                } else if (tmpCumul < 0)
-                {
-                    pitch = cumulatedPitch;
-                }
+            //Debug.Log("button pression " + buttonPression);
 
-                cumulatedPitch += pitch;
-
-                if (cumulatedPitch < 0) cumulatedPitch = 0;
-                if (cumulatedPitch > 1) cumulatedPitch = 1;
-               
-
-                Debug.Log("pitch " + pitch + " cumul " + cumulatedPitch);
-                
-
-
-                drone.Drive(power, pitch, trueYaw, 0);
-
-                previousPower = power;
-                power = buttonPression;
-            }
+            drone.Drive(buttonPression, (buttonPression > 0.1) ? 1 : 0, trueYaw, 0);
+           
+            lastBtnPressure = buttonPression;
         }
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-        //if (Input.GetKeyDown(KeyCode.W))
-        //{
         lockPitch = lockYaw = false;
-        //}
 
-
-        lastPitch = truePitch;
         lastYaw = trueYaw;
-
-        Debug.Log("Pitch :" + Mathf.Rad2Deg * truePitch + " Yaw : " + Mathf.Rad2Deg * trueYaw);
-
-
-        
+     
     }
 
     public Vector3 GetDirection()
