@@ -27,7 +27,7 @@ public class TrackersSimulation : MonoBehaviour
     {
         tracker = this.gameObject;
         myLine = new GameObject();
-
+        
         leftDevice = SteamVR_Controller.GetDeviceIndex(SteamVR_Controller.DeviceRelation.FarthestLeft);
 
         lr = myLine.AddComponent<LineRenderer>();
@@ -104,12 +104,18 @@ public class TrackersSimulation : MonoBehaviour
         
         return trueYaw;*/
         
-        Vector2 direction = new Vector2(GetDirection().x, GetDirection().z);
-        Vector2 droneDir = new Vector2(dir.x, dir.z);
+        Vector2 direction = new Vector2(GetDirection().x, GetDirection().z).normalized;
+        Vector2 droneDir = new Vector2(dir.x, dir.z).normalized;
 
-        Debug.Log("angle " + Vector2.Angle(direction, droneDir));
-        
-        return (Vector2.Dot(direction, droneDir) < 0 ?  -1 : 1) * Vector2.Angle(direction, droneDir) * Mathf.Deg2Rad;
+        //Vector2 dirOrig = new Vector2(direction.x + drone.transform.position.x, direction.y + drone.transform.position.y);
+        Vector2 droneDirOrig = new Vector2(droneDir.x + drone.transform.position.x, droneDir.y + drone.transform.position.y);
+
+        Vector2 dirOrig = drone.transform.TransformDirection(direction);
+
+        float angle = -1 * Vector2.SignedAngle(direction, droneDir);
+        Debug.Log("angle " + angle);
+
+        return angle * Mathf.Deg2Rad;
     }
 
 
